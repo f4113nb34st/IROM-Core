@@ -1,2 +1,2 @@
 # IROM-Core
-Iron Omega Core Library
+Iron Omega Core Module
