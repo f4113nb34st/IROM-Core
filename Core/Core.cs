@@ -112,7 +112,7 @@
         /// <summary>
         /// Performs any initialization work required by the application.
         /// </summary>
-        protected void Init()
+        protected virtual void Init()
         {
         	
         }
@@ -120,7 +120,7 @@
         /// <summary>
         /// Called frequently. Perform update work here.
         /// </summary>
-        protected void Tick(double time)
+        protected virtual void Tick(double time)
         {
         	
         }
@@ -131,7 +131,7 @@
         /// but number of calls is guaranteed to be correct
         /// over a period of time.
         /// </summary>
-        protected void FixedTick()
+        protected virtual void FixedTick()
         {
         	
         }
@@ -140,7 +140,7 @@
         /// Renders the screen.
         /// </summary>
         /// <param name="image">The screen to paint on.</param>
-        protected void Render(Image image)
+        protected virtual void Render(Image image)
         {
         	
         }
@@ -148,13 +148,13 @@
         /// <summary>
         /// The primary ticking/rendering loop.
         /// </summary>
-        protected void TickTask()
+        protected virtual void TickTask()
         {
             //wrap entire task in a try-catch to ensure errors are reported
             try
             {
                 //the current time
-                int time;
+                int time = Environment.TickCount;
                 //the last loop iteration time
                 int prevTime;
                 

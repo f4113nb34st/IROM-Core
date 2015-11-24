@@ -89,6 +89,12 @@
 				RenderLock = null;
 			}
 		}
+		
+		protected override void TickTask()
+		{
+			if(OnTickThreadInit != null) OnTickThreadInit(this, EventArgs.Empty);
+			base.TickTask();
+		}
         
         protected override void YieldRender()
         {
