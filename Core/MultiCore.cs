@@ -16,12 +16,20 @@
         /// <summary>
         /// The ticking thread.
         /// </summary>
-        public readonly Thread TickThread;
+        public Thread TickThread
+        {
+        	get;
+        	protected set;
+        }
         
         /// <summary>
         /// The render thread.
         /// </summary>
-        public readonly Thread RenderThread;
+        public Thread RenderThread
+        {
+        	get;
+        	protected set;
+        }
         
         /// <summary>
         /// Invoked when the tick thread starts.
@@ -80,13 +88,19 @@
 			if(isRenderer)
 			{
 				RenderThread.Start();
+			}else
+			{
+				RenderThread = null;
 			}
 			if(isTicker)
 			{
 				TickThread.Start();
 			}else
 			{
+				TickThread = null;
 				RenderLock = null;
+				//render is no longer optional
+				RenderThread.IsBackground = false;
 			}
 		}
 		
@@ -102,7 +116,6 @@
             {
             	Monitor.PulseAll(RenderLock);
             }
-        	Thread.Yield();
         }
 
         /// <summary>
@@ -120,7 +133,7 @@
                 //we will be killed automatically
                 while (true)
                 {
-                	BaseRender();
+                	bool rendered = BaseRender();
                     //wait
                     if(RenderLock != null) 
                     {
@@ -128,6 +141,10 @@
 			            {
 			            	Monitor.Wait(RenderLock);
 			            }
+                    }else
+                	if(!rendered)
+                	{
+                    	Thread.Yield();
                     }
                 }
             }catch(Exception ex)
