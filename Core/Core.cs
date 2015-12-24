@@ -89,6 +89,8 @@
             Running = true;
             //start the window
             WindowObj.Start();
+            //init title
+            WindowObj.SetTitle(Title);
             //start rendering/ticking tasks
             StartTasks();
         }
@@ -202,7 +204,7 @@
                     YieldRender();
                     
                     //update title
-                    if(!WindowObj.Fullscreen)
+                    if(!WindowObj.Fullscreen && AutoDirty)
                     {
                     	//update once a second
                         if(time - titleTime > 1)
