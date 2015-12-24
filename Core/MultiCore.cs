@@ -4,6 +4,7 @@
 	using System.Linq;
 	using System.Windows.Forms;
 	using System.Threading;
+	using System.Reflection;
 	using IROM.Util;
 	
     /// <summary>
@@ -50,7 +51,7 @@
         /// Creates a new <see cref="Core"/> with the given name and a 60Hz tickRate.
         /// </summary>
         /// <param name="title">The title.</param>
-        protected MultiCore(String title) : base(title)
+        protected MultiCore(String title) : this(title, 60)
         {
             
         }
@@ -79,11 +80,17 @@
 		{
 			bool isTicker = false;
 			bool isRenderer = false;
-			if(this.GetType().GetMethod("Tick").DeclaringType != typeof(Core) ||
-			   this.GetType().GetMethod("FixedTick").DeclaringType != typeof(Core))
-				isTicker = true;
-			if(this.GetType().GetMethod("Render").DeclaringType != typeof(Core))
-				isRenderer = true;
+			
+			MethodInfo tickMethod = this.GetType().GetMethod("Tick", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			MethodInfo fixedTickMethod = this.GetType().GetMethod("FixedTick", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			MethodInfo renderMethod = this.GetType().GetMethod("Render", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			
+			if((tickMethod != null && tickMethod.DeclaringType != typeof(Core)) ||
+			   (fixedTickMethod != null && fixedTickMethod.DeclaringType != typeof(Core)))
+					isTicker = true;
+			if(renderMethod != null && renderMethod.DeclaringType != typeof(Core))
+					isRenderer = true;
+			
 			//start the threads
 			if(isRenderer)
 			{
@@ -100,7 +107,7 @@
 				TickThread = null;
 				RenderLock = null;
 				//render is no longer optional
-				RenderThread.IsBackground = false;
+				if(RenderThread != null) RenderThread.IsBackground = false;
 			}
 		}
 		
@@ -129,9 +136,8 @@
             	if(OnRenderThreadInit != null) OnRenderThreadInit(this, EventArgs.Empty);
             	
                 //never stop rendering, 
-                //we're a background thread so 
-                //we will be killed automatically
-                while (true)
+                //unless done running
+                while(Running)
                 {
                 	bool rendered = BaseRender();
                     //wait
