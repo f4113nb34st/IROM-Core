@@ -55,13 +55,34 @@
         {
             
         }
-
+        
         /// <summary>
         /// Creates a new <see cref="Core"/> with the given title and tick rate.
         /// </summary>
         /// <param name="title">The title.</param>
         /// <param name="tickRate">The tick rate in Hz.</param>
-        protected Core(String title, double tickRate)
+        protected Core(String title, double tickRate) : this(title, tickRate, typeof(DoubleBufferStrategy))
+        {
+        	
+        }
+        
+        /// <summary>
+        /// Creates a new <see cref="Core"/> with the given title and buffer strategy.
+        /// </summary>
+        /// <param name="title">The title.</param>
+        /// <param name="renderBufferType">The render buffer type.</param>
+        protected Core(String title, Type renderBufferType) : this(title, 60, typeof(DoubleBufferStrategy))
+        {
+        	
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Core"/> with the given title, tick rate, and buffer strategy.
+        /// </summary>
+        /// <param name="title">The title.</param>
+        /// <param name="tickRate">The tick rate in Hz.</param>
+        /// <param name="renderBufferType">The render buffer type.</param>
+        protected Core(String title, double tickRate, Type renderBufferType)
         {
             //set tickRate vars
             TickRate = tickRate;
@@ -69,7 +90,7 @@
             //set the title
             Title = title;
             //create the frame
-            WindowObj = new Window();
+            WindowObj = new Window(renderBufferType);
             WindowObj.Bounds = GetScreenBounds() / 2;
             
             //create the frame rate counter
@@ -84,7 +105,8 @@
         	//perform initialization work
             Init();
             //restart smoothing on screen resize
-            WindowObj.OnResize += (sender, args) => tickDelay = 100;
+            //OBSOLETE
+            //WindowObj.OnResize += size => tickDelay = 100;
             //start running
             Running = true;
             //start the window
@@ -97,7 +119,6 @@
         
         protected virtual void StartTasks()
         {
-        	Thread.CurrentThread.Priority = ThreadPriority.Highest;
         	TickTask();
         }
         
@@ -184,8 +205,6 @@
                     time = HiResTimer.CurrentTime;
                     ellapsedTime = time - prevTime;
                     
-                    SmoothTime(ref ellapsedTime);
-                    
                     Tick(ellapsedTime);
 
                     //get ticks we need to compute
@@ -266,6 +285,8 @@
         	WindowObj.SetTitle(Title + ": " + (int)RenderRate.GetFrameRate());
         }
         
+        //OBSOLETE
+        /*
         private int tickDelay = 100;
         private readonly double[] tickBuffer = new double[100];
         private int tickIndex = 0;
@@ -306,7 +327,7 @@
 	        		time += tickPart;
 	        	}
         	}
-        }
+        }*/
     }
 }
 

@@ -46,29 +46,49 @@
         /// The lock for limiting the rendering rate to ensure constant ticking.
         /// </summary>
         private object RenderLock = new object();
-
+        
         /// <summary>
-        /// Creates a new <see cref="Core"/> with the given name and a 60Hz tickRate.
+        /// Creates a new <see cref="MultiCore"/> with the given name and a 60Hz tickRate.
         /// </summary>
         /// <param name="title">The title.</param>
         protected MultiCore(String title) : this(title, 60)
         {
             
         }
-
+        
         /// <summary>
-        /// Creates a new <see cref="Core"/> with the given title and tick rate.
+        /// Creates a new <see cref="MultiCore"/> with the given title and tick rate.
         /// </summary>
         /// <param name="title">The title.</param>
         /// <param name="tickRate">The tick rate in Hz.</param>
-        protected MultiCore(String title, double tickRate) : base(title, tickRate)
+        protected MultiCore(String title, double tickRate) : this(title, tickRate, typeof(DoubleBufferStrategy))
+        {
+        	
+        }
+        
+        /// <summary>
+        /// Creates a new <see cref="MultiCore"/> with the given title and buffer strategy.
+        /// </summary>
+        /// <param name="title">The title.</param>
+        /// <param name="renderBufferType">The render buffer type.</param>
+        protected MultiCore(String title, Type renderBufferType) : this(title, 60, typeof(DoubleBufferStrategy))
+        {
+        	
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="MultiCore"/> with the given title, tick rate, and buffer strategy.
+        /// </summary>
+        /// <param name="title">The title.</param>
+        /// <param name="tickRate">The tick rate in Hz.</param>
+        /// <param name="renderBufferType">The render buffer type.</param>
+        protected MultiCore(String title, double tickRate, Type renderBufferType) : base(title, tickRate, renderBufferType)
         {
             //create the ticking thread, runs tickTask()
             //responsible for keeping the app alive
             TickThread = new Thread(TickTask);
             TickThread.Name = Title + " Tick Thread";
             TickThread.IsBackground = false;
-            TickThread.Priority = ThreadPriority.Highest;
 
             //create the rendering thread, runs renderTask()
             RenderThread = new Thread(RenderTask);
