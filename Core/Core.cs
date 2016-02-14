@@ -45,7 +45,7 @@
         /// <summary>
         /// The id of the current frame.
         /// </summary>
-        private ulong frameID;
+        private ulong frameID = 1;
 
         /// <summary>
         /// Creates a new <see cref="Core"/> with the given name and a 60Hz tickRate.
@@ -89,9 +89,10 @@
 
             //set the title
             Title = title;
-            //create the frame
+            //create the window
             WindowObj = new Window(renderBufferType);
             WindowObj.Bounds = GetScreenBounds() / 2;
+            WindowObj.OnResize += (size => MarkDirty());
             
             //create the frame rate counter
             RenderRate = new FrameRate();
@@ -261,13 +262,13 @@
         protected virtual bool BaseRender()
         {
         	if(AutoDirty) frameID++;
-        	FrameBuffer buffer = WindowObj.GetRenderBuffer();
+        	RenderBuffer buffer = WindowObj.GetRenderBuffer();
         	if(buffer != null && buffer.LastFrameId < frameID)
         	{
         		//update last frame id
         		buffer.LastFrameId = frameID;
-                //perform paint
-                Render(buffer.Image);
+        		//perform paint
+	            Render(buffer.Image);
                 //poll frame rate
                 RenderRate.Poll();
                 //refresh window
@@ -278,7 +279,7 @@
         }
 
         /// <summary>
-        /// Updates the title of the frame and appends the frame rate.
+        /// Updates the title of the window and appends the frame rate.
         /// </summary>
         private void UpdateTitle()
         {
