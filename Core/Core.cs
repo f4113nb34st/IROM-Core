@@ -209,7 +209,7 @@
                     Tick(ellapsedTime);
 
                     //get ticks we need to compute
-					tickNum = (int)((ellapsedTime) * TickRate);
+                    tickNum = (int)((time - tickTime) * TickRate);
 					//update time
 					tickTime += tickNum / TickRate;
 					//don't allow us to get more than 5 behind
@@ -235,7 +235,7 @@
                         }
                     }
                     
-                    if(tickNum == 0) Thread.Yield();
+                    if(tickNum == 0) Thread.Sleep(1);
                 }
             }catch (Exception ex)
             {
